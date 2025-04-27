@@ -41,7 +41,7 @@ public class TriviaActivity extends AppCompatActivity {
         btnVolverAJugar = findViewById(R.id.btnVolverAJugar);
         optionTrue = findViewById(R.id.optionTrue);
         optionFalse = findViewById(R.id.optionFalse);
-        LinearLayout layoutHeader = findViewById(R.id.layoutHeader);
+        layoutHeader = findViewById(R.id.layoutHeader);
 
         if (viewModel.preguntas == null) {
             // Primera vez entrando, recibimos preguntas
