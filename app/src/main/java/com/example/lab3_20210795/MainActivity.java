@@ -1,6 +1,7 @@
 package com.example.lab3_20210795;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -19,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.lab3_20210795.databinding.ActivityMainBinding;
 
+import java.io.Serializable;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -78,7 +80,11 @@ public class MainActivity extends AppCompatActivity {
                         public void onSuccess(List<Question> questions) {
                             // Mostrar las preguntas en el Log o en la interfaz
                             Log.i("Trivia", "Preguntas obtenidas: " + questions.size());
-                            // Aquí puedes actualizar la interfaz para mostrar las preguntas
+
+                            // Pasar las preguntas a TriviaActivity
+                            Intent intent = new Intent(MainActivity.this, TriviaActivity.class);
+                            intent.putExtra("preguntas", (Serializable) questions);  // Convertir la lista en Serializable
+                            startActivity(intent);
                         }
 
                         @Override

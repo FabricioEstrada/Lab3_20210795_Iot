@@ -2,10 +2,11 @@ package com.example.lab3_20210795;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.List;
 
 // Clase interna para representar una pregunta
-public class Question {
+public class Question implements Serializable {
 
     @SerializedName("type")
     private String type;
