@@ -19,7 +19,7 @@ public class TriviaActivity extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     TriviaViewModel viewModel;
     private LinearLayout layoutHeader;
-    private TextView tvPregunta, tvContador, tvTiempoRestante;
+    private TextView tvPregunta, tvContador, tvTiempoRestante, tvLabelTiempoRestante;
     private RadioGroup radioGroupOpciones;
     private Button btnSiguiente, btnVolverAJugar;
     private RadioButton optionTrue, optionFalse;
@@ -36,6 +36,7 @@ public class TriviaActivity extends AppCompatActivity {
         tvPregunta = findViewById(R.id.tvPregunta);
         tvContador = findViewById(R.id.tvContador);
         tvTiempoRestante = findViewById(R.id.tvTiempoRestante);
+        tvLabelTiempoRestante = findViewById(R.id.tvLabelTiempoRestante);
         radioGroupOpciones = findViewById(R.id.radioGroupOpciones);
         btnSiguiente = findViewById(R.id.btnSiguiente);
         btnVolverAJugar = findViewById(R.id.btnVolverAJugar);
@@ -147,6 +148,7 @@ public class TriviaActivity extends AppCompatActivity {
         btnSiguiente.setVisibility(View.INVISIBLE);
         tvTiempoRestante.setVisibility(View.INVISIBLE);
         layoutHeader.setVisibility(View.GONE);
+        tvLabelTiempoRestante.setVisibility(View.INVISIBLE);
 
         // Mostrar resultados
         TextView tvCorrectas = findViewById(R.id.tvCorrectas);
