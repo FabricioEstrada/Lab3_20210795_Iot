@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
     private TriviaApi triviaApi;
+    private boolean isConnectionChecked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,25 +50,45 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Deshabilitar el botón de comenzar al inicio
-        binding.btnComenzar.setEnabled(false);
 
         // Click en el botón de comprobar conexión
         binding.btnComprobarConexion.setOnClickListener(v -> {
             if (isInternetAvailable()) {
                 Toast.makeText(this, "✅ ¡Conexión disponible!", Toast.LENGTH_SHORT).show();
-                binding.btnComenzar.setEnabled(true);
+                isConnectionChecked = true;  // Marcar que la conexión fue comprobada
             } else {
                 Toast.makeText(this, "❌ Sin conexión a Internet", Toast.LENGTH_SHORT).show();
+                isConnectionChecked = false;  // Marcar que la conexión fue comprobada
             }
         });
-
-        // Click en el botón de comenzar
+        binding.btnComenzar.setEnabled(true);
         binding.btnComenzar.setOnClickListener(v -> {
+            if (!isConnectionChecked) {
+                Toast.makeText(MainActivity.this, "❌ Por favor, primero comprueba la conexión a Internet", Toast.LENGTH_SHORT).show();
+                return;  // Si la conexión no ha sido comprobada, no continuar
+            }
+
             String categoriaSeleccionada = binding.spinnerCategoria.getSelectedItem().toString();
             String cantidadStr = binding.editTextCantidad.getText().toString();
-            int cantidadPreguntas = Integer.parseInt(cantidadStr);
             String dificultadSeleccionada = binding.spinnerDificultad.getSelectedItem().toString();
+
+            // Validar si algún campo está vacío o no seleccionado
+            if (categoriaSeleccionada.isEmpty() || cantidadStr.isEmpty() || dificultadSeleccionada.isEmpty()) {
+                Toast.makeText(MainActivity.this, "❌ Por favor, completa todos los campos", Toast.LENGTH_SHORT).show();
+                return;  // Salir de la función sin continuar
+            }
+
+            // Validar que la cantidad de preguntas sea un número válido
+            int cantidadPreguntas;
+            try {
+                cantidadPreguntas = Integer.parseInt(cantidadStr);
+                if (cantidadPreguntas <= 0) {
+                    throw new NumberFormatException(); // Si la cantidad no es válida
+                }
+            } catch (NumberFormatException e) {
+                Toast.makeText(MainActivity.this, "❌ La cantidad de preguntas debe ser un número válido", Toast.LENGTH_SHORT).show();
+                return;  // Salir de la función si el número es inválido
+            }
 
             // Llamar a la API para obtener las preguntas
             triviaApi.getTriviaQuestions(
@@ -78,13 +99,20 @@ public class MainActivity extends AppCompatActivity {
                     new TriviaApi.TriviaCallback() {
                         @Override
                         public void onSuccess(List<Question> questions) {
-                            // Mostrar las preguntas en el Log o en la interfaz
-                            Log.i("Trivia", "Preguntas obtenidas: " + questions.size());
 
-                            // Pasar las preguntas a TriviaActivity
-                            Intent intent = new Intent(MainActivity.this, TriviaActivity.class);
-                            intent.putExtra("preguntas", (Serializable) questions);  // Convertir la lista en Serializable
-                            startActivity(intent);
+                            // Verificar si la lista de preguntas está vacía
+                            if (questions == null || questions.isEmpty()) {
+                                // Mostrar un mensaje indicando que no se encontraron preguntas
+                                Toast.makeText(MainActivity.this, "❌ No se encuentran preguntas para esta combinación. Intenta con otra.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                // Mostrar las preguntas en el Log o en la interfaz
+                                Log.i("Trivia", "Preguntas obtenidas: " + questions.size());
+
+                                // Pasar las preguntas a TriviaActivity
+                                Intent intent = new Intent(MainActivity.this, TriviaActivity.class);
+                                intent.putExtra("preguntas", (Serializable) questions);  // Convertir la lista en Serializable
+                                startActivity(intent);
+                            }
                         }
 
                         @Override

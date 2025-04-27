@@ -63,8 +63,6 @@
             android:text="00:19"
             android:textSize="14sp"
             android:textColor="#333"
-            android:gravity="center"
-            android:layout_gravity=""
             android:layout_marginBottom="8dp" />
     </LinearLayout>
 
@@ -76,8 +74,6 @@
         android:textSize="14sp"
         android:textColor="#333"
         android:layout_marginStart="8dp" />
-    <!-- Título del tiempo restante centrado arriba de la pregunta -->
-
 
     <!-- Pregunta -->
     <TextView
@@ -125,60 +121,60 @@
         android:background="@drawable/bg_button"
         android:enabled="false"/>
 
-    <!-- Resultados -->
+    <!-- Resultados centrados -->
     <LinearLayout
         android:id="@+id/llResultados"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:visibility="gone"
+        android:layout_height="match_parent"
+        android:layout_marginTop="24dp"
         android:background="@drawable/bg_resultados"
+        android:gravity="center"
+        android:orientation="vertical"
         android:padding="16dp"
-        android:layout_marginTop="24dp">
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/tvResultados"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
             android:text="Resultados"
-            android:textSize="24sp"
             android:textColor="#000"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvCorrectas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
             android:text="Correctas: 0"
-            android:textSize="18sp"
-            android:layout_marginBottom="4dp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/tvIncorrectas"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
             android:text="Incorrectas: 0"
-            android:textSize="18sp"
-            android:layout_marginBottom="4dp" />
+            android:textSize="18sp" />
 
         <TextView
             android:id="@+id/tvSinResponder"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
             android:text="Sin responder: 0"
-            android:textSize="18sp"
-            android:layout_marginBottom="12dp" />
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/btnVolverAJugar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Volver a Jugar"
+            android:background="@drawable/bg_button"
             android:backgroundTint="#1D1D7C"
-            android:textColor="#FFFFFF"
-            android:background="@drawable/bg_button" />
+            android:text="Volver a Jugar"
+            android:textColor="#FFFFFF" />
     </LinearLayout>
 
 </LinearLayout>

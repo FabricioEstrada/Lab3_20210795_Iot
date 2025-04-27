@@ -19,7 +19,7 @@ public class TriviaActivity extends AppCompatActivity {
     private CountDownTimer countDownTimer;
     TriviaViewModel viewModel;
     private LinearLayout layoutHeader;
-    private TextView tvPregunta, tvContador, tvTiempoRestante, tvLabelTiempoRestante;
+    private TextView tvPregunta, tvContador, tvTiempoRestante, tvLabelTiempoRestante, tvSubtitulo;
     private RadioGroup radioGroupOpciones;
     private Button btnSiguiente, btnVolverAJugar;
     private RadioButton optionTrue, optionFalse;
@@ -35,6 +35,7 @@ public class TriviaActivity extends AppCompatActivity {
         // Inicializar vistas
         tvPregunta = findViewById(R.id.tvPregunta);
         tvContador = findViewById(R.id.tvContador);
+        tvSubtitulo = findViewById(R.id.tvSubtitulo);
         tvTiempoRestante = findViewById(R.id.tvTiempoRestante);
         tvLabelTiempoRestante = findViewById(R.id.tvLabelTiempoRestante);
         radioGroupOpciones = findViewById(R.id.radioGroupOpciones);
@@ -51,8 +52,19 @@ public class TriviaActivity extends AppCompatActivity {
 
             if (preguntas != null && !preguntas.isEmpty()) {
                 viewModel.preguntas = preguntas;
-                int dificultad = intent.getIntExtra("dificultad", 1);
-                tiempoPorPregunta = dificultad == 1 ? 5000 : (dificultad == 2 ? 7000 : 10000);
+                String dificultad = viewModel.preguntas.get(0).getDifficulty();
+                String categoria = viewModel.preguntas.get(0).getCategory();
+                tvSubtitulo.setText(categoria);
+                if ("easy".equals(dificultad)) {
+                    tiempoPorPregunta = 5000;  // 5 segundos por pregunta
+                } else if ("medium".equals(dificultad)) {
+                    tiempoPorPregunta = 7000;  // 7 segundos por pregunta
+                } else if ("hard".equals(dificultad)) {
+                    tiempoPorPregunta = 10000;  // 10 segundos por pregunta
+                } else {
+                    // En caso de que no se reciba una dificultad válida, se asigna un valor por defecto
+                    tiempoPorPregunta = 5000;  // 5 segundos por pregunta
+                }
                 viewModel.timeRemaining = preguntas.size() * tiempoPorPregunta;
 
                 startTimer();
