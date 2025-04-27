@@ -133,7 +133,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Comenzar"
-                    android:backgroundTint="#AAAAAA"
+                    android:backgroundTint="#E78600"
                     android:textColor="#FFFFFF"
                     android:enabled="false"
                     android:gravity="center"

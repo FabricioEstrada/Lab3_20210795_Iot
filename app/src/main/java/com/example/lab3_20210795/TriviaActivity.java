@@ -5,35 +5,32 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
-import java.io.Serializable;
 import java.util.List;
 
 public class TriviaActivity extends AppCompatActivity {
-
-    private List<Question> preguntas;
-    private int currentQuestionIndex = 0;
-    private int correctAnswersCount = 0;
-    private int incorrectAnswersCount = 0;
-    private int unansweredCount = 0;  // Contador de preguntas sin responder
-    private long timeRemaining;
     private CountDownTimer countDownTimer;
-
+    TriviaViewModel viewModel;
+    private LinearLayout layoutHeader;
     private TextView tvPregunta, tvContador, tvTiempoRestante;
     private RadioGroup radioGroupOpciones;
     private Button btnSiguiente, btnVolverAJugar;
     private RadioButton optionTrue, optionFalse;
 
+    private int tiempoPorPregunta;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trivia);
+        viewModel = new ViewModelProvider(this).get(TriviaViewModel.class);
 
         // Inicializar vistas
         tvPregunta = findViewById(R.id.tvPregunta);
@@ -44,71 +41,71 @@ public class TriviaActivity extends AppCompatActivity {
         btnVolverAJugar = findViewById(R.id.btnVolverAJugar);
         optionTrue = findViewById(R.id.optionTrue);
         optionFalse = findViewById(R.id.optionFalse);
+        LinearLayout layoutHeader = findViewById(R.id.layoutHeader);
 
-        // Obtener la lista de preguntas del Intent
-        Intent intent = getIntent();
-        preguntas = (List<Question>) intent.getSerializableExtra("preguntas");
+        if (viewModel.preguntas == null) {
+            // Primera vez entrando, recibimos preguntas
+            Intent intent = getIntent();
+            List<Question> preguntas = (List<Question>) intent.getSerializableExtra("preguntas");
 
-        if (preguntas != null && !preguntas.isEmpty()) {
-            // Calcular el tiempo dependiendo de la dificultad
-            int totalPreguntas = preguntas.size();
-            int dificultad = intent.getIntExtra("dificultad", 1); // dificultad 1: fácil, 2: medio, 3: difícil
-            int tiempoPorPregunta = dificultad == 1 ? 5000 : (dificultad == 2 ? 7000 : 10000);
-            timeRemaining = totalPreguntas * tiempoPorPregunta;
+            if (preguntas != null && !preguntas.isEmpty()) {
+                viewModel.preguntas = preguntas;
+                int dificultad = intent.getIntExtra("dificultad", 1);
+                tiempoPorPregunta = dificultad == 1 ? 5000 : (dificultad == 2 ? 7000 : 10000);
+                viewModel.timeRemaining = preguntas.size() * tiempoPorPregunta;
 
-            // Iniciar el temporizador
-            startTimer();
-
-            // Mostrar la primera pregunta
-            displayCurrentQuestion();
+                startTimer();
+                displayCurrentQuestion();
+            } else {
+                Toast.makeText(this, "No se recibieron preguntas", Toast.LENGTH_SHORT).show();
+            }
         } else {
-            Toast.makeText(this, "No se recibieron preguntas", Toast.LENGTH_SHORT).show();
+            // Si ya existía (rotación u otro evento), solo restaurar
+            if (viewModel.isGameFinished) {
+                showResult();
+            } else {
+                startTimer();
+                displayCurrentQuestion();
+            }
         }
+
         btnSiguiente.setEnabled(true);
         btnSiguiente.setOnClickListener(v -> {
-            // Comprobar si se ha seleccionado una respuesta
             if (radioGroupOpciones.getCheckedRadioButtonId() == -1) {
-                // Si no se seleccionó ninguna respuesta, incrementar sin responder
-                unansweredCount++;
+                viewModel.unansweredCount++;
             } else {
-                // Obtener la respuesta seleccionada
                 boolean selectedAnswer = optionTrue.isChecked();
-
-                // Comparar la respuesta seleccionada con la respuesta correcta
-                if (selectedAnswer == preguntas.get(currentQuestionIndex).getCorrectAnswer()) {
-                    correctAnswersCount++;
+                if (selectedAnswer == viewModel.preguntas.get(viewModel.currentQuestionIndex).getCorrectAnswer()) {
+                    viewModel.correctAnswersCount++;
                 } else {
-                    incorrectAnswersCount++;
+                    viewModel.incorrectAnswersCount++;
                 }
             }
 
-            // Avanzar a la siguiente pregunta
-            currentQuestionIndex++;
-            if (currentQuestionIndex < preguntas.size()) {
+            viewModel.currentQuestionIndex++;
+            if (viewModel.currentQuestionIndex < viewModel.preguntas.size()) {
                 displayCurrentQuestion();
             } else {
-                // Fin del cuestionario, mostrar el resultado
                 showResult();
             }
-
-            // Limpiar la selección de radio para la siguiente pregunta
             radioGroupOpciones.clearCheck();
         });
 
-
-        // Configurar el botón de volver a jugar
         btnVolverAJugar.setOnClickListener(v -> {
-            // Reiniciar la actividad para comenzar un nuevo juego
             finish();
             startActivity(getIntent());
         });
     }
 
     private void startTimer() {
-        countDownTimer = new CountDownTimer(timeRemaining, 1000) {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+
+        countDownTimer = new CountDownTimer(viewModel.timeRemaining, 1000) {
             @Override
             public void onTick(long millisUntilFinished) {
-                timeRemaining = millisUntilFinished;
+                viewModel.timeRemaining = millisUntilFinished;
                 int seconds = (int) (millisUntilFinished / 1000);
                 int minutes = seconds / 60;
                 seconds = seconds % 60;
@@ -117,55 +114,50 @@ public class TriviaActivity extends AppCompatActivity {
 
             @Override
             public void onFinish() {
-                // Si se acabó el tiempo, mostrar resultados
-                // Si se acabó el tiempo, marcar todas las preguntas no respondidas
-                for (int i = currentQuestionIndex; i < preguntas.size(); i++) {
-                    // Si la pregunta no ha sido respondida, la marcamos como sin respuesta
-                    unansweredCount++;
+                if (!viewModel.isGameFinished) {
+                    for (int i = viewModel.currentQuestionIndex; i < viewModel.preguntas.size(); i++) {
+                        viewModel.unansweredCount++;
+                    }
+                    showResult();
                 }
-                showResult();
             }
-        };
-        countDownTimer.start();
+        }.start();
     }
 
     private void displayCurrentQuestion() {
-        // Mostrar la pregunta y las opciones
-        Question currentQuestion = preguntas.get(currentQuestionIndex);
+        Question currentQuestion = viewModel.preguntas.get(viewModel.currentQuestionIndex);
         tvPregunta.setText(currentQuestion.getQuestion());
         optionTrue.setText("True");
         optionFalse.setText("False");
 
-        // Limpiar selección previa
         radioGroupOpciones.clearCheck();
-
-        // Actualizar contador
-        tvContador.setText("Pregunta " + (currentQuestionIndex + 1) + " de " + preguntas.size());
+        tvContador.setText("Pregunta " + (viewModel.currentQuestionIndex + 1) + " de " + viewModel.preguntas.size());
     }
 
     private void showResult() {
-        // Detener el temporizador
-        countDownTimer.cancel();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+        viewModel.isGameFinished = true;
 
-        // Ocultar las preguntas
+        // Ocultar vistas de preguntas
         tvPregunta.setVisibility(View.INVISIBLE);
         tvContador.setVisibility(View.INVISIBLE);
         radioGroupOpciones.setVisibility(View.INVISIBLE);
         btnSiguiente.setVisibility(View.INVISIBLE);
         tvTiempoRestante.setVisibility(View.INVISIBLE);
+        layoutHeader.setVisibility(View.GONE);
 
-        // Mostrar los resultados
+        // Mostrar resultados
         TextView tvCorrectas = findViewById(R.id.tvCorrectas);
         TextView tvIncorrectas = findViewById(R.id.tvIncorrectas);
         TextView tvSinResponder = findViewById(R.id.tvSinResponder);
 
-        tvCorrectas.setText("Correctas: " + correctAnswersCount);
-        tvIncorrectas.setText("Incorrectas: " + incorrectAnswersCount);
-        tvSinResponder.setText("Sin responder: " + unansweredCount);
+        tvCorrectas.setText("Correctas: " + viewModel.correctAnswersCount);
+        tvIncorrectas.setText("Incorrectas: " + viewModel.incorrectAnswersCount);
+        tvSinResponder.setText("Sin responder: " + viewModel.unansweredCount);
 
-        // Mostrar la vista de resultados
         findViewById(R.id.llResultados).setVisibility(View.VISIBLE);
-        btnVolverAJugar.setVisibility(View.VISIBLE); // Hacer visible el botón de volver a jugar
+        btnVolverAJugar.setVisibility(View.VISIBLE);
     }
 }
-

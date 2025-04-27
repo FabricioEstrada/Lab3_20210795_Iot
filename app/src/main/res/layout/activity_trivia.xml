@@ -9,6 +9,7 @@
 
     <!-- Cabecera -->
     <LinearLayout
+        android:id="@+id/layoutHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
@@ -24,51 +25,66 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="¿Listo? ¡Juega!"
-            android:textSize="22sp"
             android:textColor="#000"
-            android:textStyle="bold" />
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/tvSubtitulo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="General Knowledge"
+            android:textColor="#333"
             android:textSize="14sp"
-            android:textColor="#333" />
+            android:visibility="visible" />
     </LinearLayout>
 
-    <!-- Contador de tiempo -->
+    <!-- Nuevo contenedor para "Tiempo Restante:" y contador -->
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:gravity="center"
+        android:gravity="end"
         android:layout_marginBottom="8dp">
+
+        <TextView
+            android:id="@+id/tvLabelTiempoRestante"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tiempo Restante: "
+            android:textSize="14sp"
+            android:textColor="#333" />
 
         <TextView
             android:id="@+id/tvTiempoRestante"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tiempo restante"
-            android:textSize="14sp"
-            android:textColor="#333" />
-
-        <TextView
-            android:id="@+id/tvContador"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" 00:19"
+            android:text="00:19"
             android:textSize="14sp"
             android:textColor="#333"
-            android:layout_marginStart="8dp" />
+            android:gravity="center"
+            android:layout_gravity=""
+            android:layout_marginBottom="8dp" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvContador"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pregunta 1/3"
+        android:textSize="14sp"
+        android:textColor="#333"
+        android:layout_marginStart="8dp" />
+    <!-- Título del tiempo restante centrado arriba de la pregunta -->
+
 
     <!-- Pregunta -->
     <TextView
         android:id="@+id/tvPregunta"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Pregunta 1/3\n\nPopcorn was invented in 1871 by Frederick W. Rueckheim..."
+        android:text="Popcorn was invented in 1871 by Frederick W. Rueckheim..."
         android:textSize="16sp"
         android:textColor="#000"
         android:gravity="center"
